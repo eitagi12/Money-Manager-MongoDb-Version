@@ -3,8 +3,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
-import Sidebar from "./sidebar";
-import { Row, Col } from "antd";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -24,18 +22,11 @@ export default function DenseAppBar() {
   return (
     <div className={classes.root}>
       <AppBar position="static" className={classes.appBar}>
-        <Row>
-          <Col>
-            <Sidebar />
-          </Col>
-          <Col>
-            <Toolbar variant="dense">
-              <Typography variant="h6" color="inherit">
-                Money Manager
-              </Typography>
-            </Toolbar>
-          </Col>
-        </Row>
+        <Toolbar variant="dense">
+          <Typography variant="h6" color="inherit">
+            Money Manager
+          </Typography>
+        </Toolbar>
       </AppBar>
     </div>
   );

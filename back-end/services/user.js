@@ -17,7 +17,7 @@ module.exports = (app, db) => {
             firstname: req.body.firstname,
             lastname: req.body.lastname,
             phone_number: req.body.phone_number,
-            role: user
+            role: "user"
           });
           res.status(200).send({ message: "user created" });
         }

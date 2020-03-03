@@ -8,6 +8,7 @@ export default class Login extends Component {
     const onFinish = values => {
       Axios.post("/loginuser", values)
         .then(res => {
+          localStorage.setItem("Access_TOKEN", res.data.token);
           console.log(res);
           console.log("Success:", values);
         })

@@ -4,6 +4,8 @@ import jwtDecode from "jwt-decode";
 import home from "./pages/home/";
 import loginPage from "./pages/login";
 import registerPage from "./pages/register";
+import activityPage from "./pages/activity";
+import historyPage from "./pages/history";
 
 function App() {
   return (
@@ -12,6 +14,8 @@ function App() {
         <Route exact path="/" component={loginPage} />
         <Route exaxt path="/home" component={home} />
         <Route exact path="/register" component={registerPage} />
+        <Route exact path="/newactivity" component={activityPage} />
+        <Route exact path="/history" component={historyPage} />
         <Redirect to="/" />
       </Switch>
     </div>

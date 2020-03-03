@@ -1,51 +1,23 @@
-import React, { Component, useState } from "react";
-import {
-  Form,
-  Input,
-  Tooltip,
-  Cascader,
-  Select,
-  Row,
-  Col,
-  Checkbox,
-  Button,
-  AutoComplete
-} from "antd";
-import { QuestionCircleOutlined } from "@ant-design/icons";
-
-const { Option } = Select;
-const AutoCompleteOption = AutoComplete.Option;
+import React, { Component } from "react";
+import { Form, Input, Button } from "antd";
+import Axios from "../../../config/axios.setup";
 
 export default class Register extends Component {
   render() {
-    const layout = {
-      labelCol: { span: 8 },
-      wrapperCol: { span: 16 }
-    };
-
-    const validateMessages = {
-      required: "This field is required!",
-      types: {
-        email: "Not a validate email!",
-        number: "Not a validate number!"
-      },
-      number: {
-        range: "Must be between ${min} and ${max}"
-      }
-    };
-
     const onFinish = values => {
-      console.log(values);
+      Axios.post("/registeruser", values)
+        .then(res => {
+          console.log(res);
+          console.log("Success:", values);
+        })
+        .catch(err => {
+          console.log("Something Wrong");
+        });
     };
 
     return (
       <div>
-        <Form
-          {...layout}
-          name="nest-messages"
-          onFinish={onFinish}
-          validateMessages={validateMessages}
-        >
+        <Form name="nest-messages" onFinish={onFinish}>
           <Form.Item
             name="username"
             label="Username"
@@ -79,7 +51,7 @@ export default class Register extends Component {
             <Input />
           </Form.Item>
           <Form.Item
-            name="phone"
+            name="phone_number"
             label="Phone Number"
             rules={[
               { required: true, message: "Please input your phone number!" }
@@ -87,7 +59,7 @@ export default class Register extends Component {
           >
             <Input addonBefore="+66" style={{ width: "100%" }} />
           </Form.Item>
-          <Form.Item wrapperCol={{ ...layout.wrapperCol, offset: 8 }}>
+          <Form.Item>
             <Button type="primary" htmlType="submit">
               Submit
             </Button>

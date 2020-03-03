@@ -1,76 +1,111 @@
 import React from "react";
-import PropTypes from "prop-types";
+import { Link } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
-import Tabs from "@material-ui/core/Tabs";
-import Tab from "@material-ui/core/Tab";
-import Typography from "@material-ui/core/Typography";
-import Box from "@material-ui/core/Box";
+import Drawer from "@material-ui/core/Drawer";
+import Button from "@material-ui/core/Button";
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import MenuIcon from "@material-ui/icons/Menu";
+import DashboardIcon from "@material-ui/icons/Dashboard";
+import AddBoxIcon from "@material-ui/icons/AddBox";
+import HistoryIcon from "@material-ui/icons/History";
+import AccountBalanceIcon from "@material-ui/icons/AccountBalance";
+import MeetingRoomIcon from "@material-ui/icons/MeetingRoom";
 
-function TabPanel(props) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <Typography
-      component="div"
-      role="tabpanel"
-      hidden={value !== index}
-      id={`vertical-tabpanel-${index}`}
-      aria-labelledby={`vertical-tab-${index}`}
-      {...other}
-    >
-      {value === index && <Box p={3}>{children}</Box>}
-    </Typography>
-  );
-}
-
-TabPanel.propTypes = {
-  children: PropTypes.node,
-  index: PropTypes.any.isRequired,
-  value: PropTypes.any.isRequired
-};
-
-function a11yProps(index) {
-  return {
-    id: `vertical-tab-${index}`,
-    "aria-controls": `vertical-tabpanel-${index}`
-  };
-}
-
-const useStyles = makeStyles(theme => ({
-  root: {
-    flexGrow: 1,
-    backgroundColor: "#FCEAFF",
-    display: "flex",
-    height: "100vh"
+const useStyles = makeStyles({
+  list: {
+    width: 250
   },
-  tabs: {
-    borderRight: `1px solid ${theme.palette.divider}`
+  fullList: {
+    width: "auto"
   }
-}));
+});
 
-export default function VerticalTabs() {
+export default function TemporaryDrawer() {
   const classes = useStyles();
-  const [value, setValue] = React.useState(0);
+  const [state, setState] = React.useState({
+    left: false
+  });
 
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
+  const toggleDrawer = (side, open) => event => {
+    if (
+      event.type === "keydown" &&
+      (event.key === "Tab" || event.key === "Shift")
+    ) {
+      return;
+    }
+
+    setState({ ...state, [side]: open });
+  };
+  const handleLogout = () => {
+    localStorage.removeItem("Access_TOKEN");
   };
 
+  const sideList = side => (
+    <div
+      className={classes.list}
+      role="presentation"
+      onClick={toggleDrawer(side, false)}
+      onKeyDown={toggleDrawer(side, false)}
+    >
+      <List style={{ fontSize: "18px", fontWeight: "bold" }}>
+        <Link to="/home">
+          <ListItem button>
+            <ListItemIcon>
+              <DashboardIcon />
+              <p style={{ marginLeft: "5px" }}>Dashboard</p>
+            </ListItemIcon>
+          </ListItem>
+        </Link>
+        <Link to="/newactivity">
+          <ListItem button>
+            <ListItemIcon>
+              <AddBoxIcon />
+              <p style={{ marginLeft: "5px" }}>New Activity</p>
+            </ListItemIcon>
+          </ListItem>
+        </Link>
+        <Link to="/history">
+          <ListItem button>
+            <ListItemIcon>
+              <HistoryIcon />
+              <p style={{ marginLeft: "5px" }}> History</p>
+            </ListItemIcon>
+          </ListItem>
+        </Link>
+        <ListItem button>
+          <ListItemIcon>
+            <AccountBalanceIcon />
+            <p style={{ marginLeft: "5px" }}> Manage Account</p>
+          </ListItemIcon>
+        </ListItem>
+        <ListItem button>
+          <ListItemIcon onClick={handleLogout}>
+            <MeetingRoomIcon />
+            <p style={{ marginLeft: "5px" }}> Log out</p>
+          </ListItemIcon>
+        </ListItem>
+      </List>
+    </div>
+  );
+
   return (
-    <div className={classes.root}>
-      <Tabs
-        orientation="vertical"
-        variant="scrollable"
-        value={value}
-        onChange={handleChange}
-        aria-label="Vertical tabs example"
-        className={classes.tabs}
+    <div style={{ marginTop: "5px", marginLeft: "5px" }}>
+      <Button
+        variant="contained"
+        onClick={toggleDrawer("left", true)}
+        style={{
+          color: "white",
+          backgroundColor: "#4B4453",
+          textAlign: "center"
+        }}
       >
-        <Tab label="Dash Board" />
-        <Tab label="New Activity" />
-        <Tab label="History" />
-        <Tab label="Manage Account" />
-      </Tabs>
+        <MenuIcon />
+      </Button>
+      <Drawer open={state.left} onClose={toggleDrawer("left", false)}>
+        {sideList("left")}
+      </Drawer>
     </div>
   );
 }
