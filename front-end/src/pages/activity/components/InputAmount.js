@@ -14,10 +14,15 @@ import MonetizationOnIcon from "@material-ui/icons/MonetizationOn";
 import NoteIcon from "@material-ui/icons/Note";
 import AccountBalanceIcon from "@material-ui/icons/AccountBalance";
 import DateRangeIcon from "@material-ui/icons/DateRange";
+var moment = require("moment");
 
 export default class InputIncome extends Component {
   render() {
-    const onFinish = values => {
+    const onFinish = fieldsValue => {
+      const values = {
+        ...fieldsValue,
+        date: fieldsValue["date"].format("YYYY-MM-DD")
+      };
       Axios.post("/addactivity", values)
         .then(res => {
           window.location.reload();

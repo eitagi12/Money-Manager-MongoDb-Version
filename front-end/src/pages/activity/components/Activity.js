@@ -121,7 +121,7 @@ export default function FullWidthTabs() {
                 <TableRow>
                   <TableCell align="center">Remark</TableCell>
                   <TableCell align="center">Amount (Baht)</TableCell>
-                  <TableCell align="center">Date/Time</TableCell>
+                  <TableCell align="center">Time</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -134,7 +134,7 @@ export default function FullWidthTabs() {
                       {new Intl.NumberFormat().format(row.amount)}
                     </TableCell>
                     <TableCell align="center">
-                      {moment(row.date).format("LLL")}
+                      {moment(row.date).format("LL")}
                     </TableCell>
                   </TableRow>
                 ))}
