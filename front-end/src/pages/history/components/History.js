@@ -16,16 +16,23 @@ var moment = require("moment");
 export default class History extends Component {
   state = {
     historyData: [],
-    visible: false,
     remark: "",
     amount: "",
-    date: ""
+    date: "",
+    visible: []
   };
   fetchData = () => {
     Axios.get("/getactivity").then(result => {
+      let visible = [];
+      for (let boo of result.data) {
+        visible.push(false);
+      }
+
       this.setState({
-        historyData: result.data
+        historyData: result.data,
+        visible: visible
       });
+
       console.log(this.state.historyData);
     });
   };
@@ -38,8 +45,9 @@ export default class History extends Component {
       date: fieldsValue["date"].format("YYYY-MM-DD")
     };
     console.log(values);
-    Axios.get("/getbydate", values)
+    Axios.post("/getbydate", values)
       .then(res => {
+        this.setState({ historyData: res.data });
         console.log(res.data);
         console.log("Success:", values);
       })
@@ -59,35 +67,42 @@ export default class History extends Component {
       });
   };
 
-  showModal = () => {
+  showModal = idx => {
+    let visible = this.state.visible;
+    visible[idx] = true;
     this.setState({
-      visible: true
+      visible
     });
   };
 
-  handleOk = id => {
-    // let payload = {
-    //   remarks: this.state.remark,
-    //   amount: this.state.amount,
-    //   date: this.state.date
-    // };
-    // Axios.put(`/update-activity/${id}`, payload)
-    //   .then(result => {
-    //     console.log(result);
-    //     this.setState({
-    //       visible: false
-    //     });
-    //   })
-    //   .catch(err => {
-    //     console.error(err);
-    //   });
+  handleOk = (id, idx) => {
+    let payload = {
+      remarks: this.state.remark,
+      amount: this.state.amount,
+      date: this.state.date
+    };
+    Axios.put(`/update-activity/${id}`, payload)
+      .then(result => {
+        console.log(result);
+        this.fetchData();
+        let visible = this.state.visible;
+        visible[idx] = false;
+        this.setState({
+          visible
+        });
+      })
+      .catch(err => {
+        console.error(err);
+      });
     console.log(id);
   };
 
-  handleCancel = e => {
-    console.log(e);
+  handleCancel = idx => {
+    console.log(idx);
+    let visible = this.state.visible;
+    visible[idx] = false;
     this.setState({
-      visible: false
+      visible
     });
   };
 
@@ -151,62 +166,71 @@ export default class History extends Component {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {this.state.historyData.map(row => (
-                    <TableRow key={row.id}>
-                      <TableCell align="center">{row.remarks}</TableCell>
-                      <TableCell align="center">{row.amount}</TableCell>
-                      <TableCell align="center">{row.date}</TableCell>
-                      <TableCell align="center">
-                        <Button
-                          type="primary"
-                          danger
-                          onClick={this.handleDelete.bind(this, row.id)}
-                        >
-                          <DeleteOutlined />
-                        </Button>
-                        <Button type="primary" onClick={this.showModal}>
-                          <EditOutlined />
-                        </Button>
-                        <Modal
-                          title="Edit"
-                          visible={this.state.visible}
-                          onOk={this.handleOk.bind(this, row.id)}
-                          onCancel={this.handleCancel}
-                        >
-                          <Row>
-                            Remark
-                            <Input
-                              placeholder="New Remark"
-                              onChange={e =>
-                                this.setState({ remark: e.target.value })
-                              }
-                            />
-                          </Row>
-                          <Row style={{ marginTop: "10px" }}>
-                            Amount
-                            <Input
-                              type="number"
-                              min="0"
-                              placeholder="New Amount"
-                              onChange={e =>
-                                this.setState({ amount: e.target.value })
-                              }
-                            />
-                          </Row>
+                  {this.state.historyData.map((row, idx) => {
+                    let color = row.type === "income" ? "green" : "red";
+                    let sign = row.type === "income" ? "+" : "-";
+                    return (
+                      <TableRow key={row.id}>
+                        <TableCell align="center">{row.remarks}</TableCell>
+                        <TableCell align="center" style={{ color }}>
+                          {sign + " " + row.amount}
+                        </TableCell>
+                        <TableCell align="center">{row.date}</TableCell>
+                        <TableCell align="center">
+                          <Button
+                            type="primary"
+                            danger
+                            onClick={this.handleDelete.bind(this, row.id)}
+                          >
+                            <DeleteOutlined />
+                          </Button>
+                          <Button
+                            type="primary"
+                            onClick={() => this.showModal(idx)}
+                          >
+                            <EditOutlined />
+                          </Button>
+                          <Modal
+                            title="Edit"
+                            visible={this.state.visible[idx]}
+                            onOk={() => this.handleOk(row.id, idx)}
+                            onCancel={() => this.handleCancel(idx)}
+                          >
+                            <Row>
+                              Remark
+                              <Input
+                                placeholder="New Remark"
+                                onChange={e =>
+                                  this.setState({ remark: e.target.value })
+                                }
+                              />
+                            </Row>
+                            <Row style={{ marginTop: "10px" }}>
+                              Amount
+                              <Input
+                                type="number"
+                                min="0"
+                                placeholder="New Amount"
+                                onChange={e =>
+                                  this.setState({ amount: e.target.value })
+                                }
+                              />
+                            </Row>
 
-                          <Row style={{ marginTop: "10px" }}>
-                            Date
-                            <DatePicker
-                              onChange={(date, dateString) =>
-                                this.setState({ date: dateString })
-                              }
-                              style={{ width: "100%" }}
-                            />
-                          </Row>
-                        </Modal>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                            <Row style={{ marginTop: "10px" }}>
+                              Date
+                              <DatePicker
+                                onChange={(date, dateString) =>
+                                  this.setState({ date: dateString })
+                                }
+                                style={{ width: "100%" }}
+                              />
+                            </Row>
+                          </Modal>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </TableContainer>

@@ -1,6 +1,8 @@
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
 const jwtOptions = require("../config/passport/passport");
+const moment = require("moment");
+const { Op } = require("sequelize");
 
 module.exports = (app, db) => {
   app.post(
@@ -37,7 +39,14 @@ module.exports = (app, db) => {
     function(req, res) {
       db.activity
         .findAll({
-          where: { user_id: req.user.id }
+          where: {
+            user_id: req.user.id,
+            date: moment().format("YYYY-MM-DD")
+          },
+          order: [
+            ["date", "ASC"],
+            ["id", "ASC"]
+          ]
         })
         .then(result => {
           res.status(201).send(result);
@@ -53,7 +62,19 @@ module.exports = (app, db) => {
     function(req, res) {
       db.activity
         .findAll({
-          where: { user_id: req.user.id, type: "income" }
+          where: {
+            user_id: req.user.id,
+            type: "income",
+            createdAt: {
+              [Op.gte]: moment()
+                .startOf("day")
+                .toDate()
+            }
+          },
+          order: [
+            ["date", "ASC"],
+            ["id", "ASC"]
+          ]
         })
         .then(result => {
           res.status(201).send(result);
@@ -80,10 +101,11 @@ module.exports = (app, db) => {
     }
   );
 
-  app.get(
+  app.post(
     "/getbydate",
     passport.authenticate("jwt", { session: false }),
     function(req, res) {
+      console.log({ req_body: req.body });
       db.activity
         .findAll({
           where: { date: req.body.date, user_id: req.user.id }
@@ -92,6 +114,7 @@ module.exports = (app, db) => {
           res.status(201).send(result);
         })
         .catch(err => {
+          console.log(err);
           res.status(400).send({ message: err.message });
         });
     }
@@ -131,6 +154,46 @@ module.exports = (app, db) => {
         });
         res.status(200).json({ message: "success" });
       }
+    }
+  );
+
+  app.get(
+    "/dashboard",
+    passport.authenticate("jwt", { session: false }),
+    async function(req, res) {
+      let incomeDashboard = 0;
+      let expenseDashboard = 0;
+
+      await db.activity
+        .findAll({
+          attributes: [
+            [db.Sequelize.fn("SUM", db.Sequelize.col("amount")), "totalAmount"]
+          ],
+          where: { user_id: req.user.id, type: "income" }
+        })
+        .then(result => {
+          incomeDashboard = result[0].dataValues.totalAmount;
+        })
+        .catch(err => {
+          res.status(400).send({ message: err.message });
+        });
+      await db.activity
+        .findAll({
+          attributes: [
+            [db.Sequelize.fn("SUM", db.Sequelize.col("amount")), "totalAmount"]
+          ],
+          where: { user_id: req.user.id, type: "expense" }
+        })
+        .then(result => {
+          expenseDashboard = result[0].dataValues.totalAmount;
+        })
+        .catch(err => {
+          res.status(400).send({ message: err.message });
+        });
+      let balanceDashboard = incomeDashboard - expenseDashboard;
+      res
+        .status(200)
+        .send({ incomeDashboard, expenseDashboard, balanceDashboard });
     }
   );
 };

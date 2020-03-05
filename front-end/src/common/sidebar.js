@@ -10,7 +10,6 @@ import MenuIcon from "@material-ui/icons/Menu";
 import DashboardIcon from "@material-ui/icons/Dashboard";
 import AddBoxIcon from "@material-ui/icons/AddBox";
 import HistoryIcon from "@material-ui/icons/History";
-import AccountBalanceIcon from "@material-ui/icons/AccountBalance";
 import MeetingRoomIcon from "@material-ui/icons/MeetingRoom";
 
 const useStyles = makeStyles({
@@ -40,6 +39,7 @@ export default function TemporaryDrawer() {
   };
   const handleLogout = () => {
     localStorage.removeItem("Access_TOKEN");
+    window.location.reload();
   };
 
   const sideList = side => (
@@ -50,7 +50,7 @@ export default function TemporaryDrawer() {
       onKeyDown={toggleDrawer(side, false)}
     >
       <List style={{ fontSize: "18px", fontWeight: "bold" }}>
-        <Link to="/home">
+        <Link to="/dashboard">
           <ListItem button>
             <ListItemIcon>
               <DashboardIcon />
@@ -74,14 +74,8 @@ export default function TemporaryDrawer() {
             </ListItemIcon>
           </ListItem>
         </Link>
-        <ListItem button>
+        <ListItem button onClick={handleLogout}>
           <ListItemIcon>
-            <AccountBalanceIcon />
-            <p style={{ marginLeft: "5px" }}> Manage Account</p>
-          </ListItemIcon>
-        </ListItem>
-        <ListItem button>
-          <ListItemIcon onClick={handleLogout}>
             <MeetingRoomIcon />
             <p style={{ marginLeft: "5px" }}> Log out</p>
           </ListItemIcon>

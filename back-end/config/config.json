@@ -5,7 +5,8 @@
     "database": "income-expense-account",
     "host": "127.0.0.1",
     "dialect": "mysql",
-    "operatorsAliases": false
+    "operatorsAliases": false,
+    "timezone": "+07:00"
   },
   "test": {
     "username": "root",

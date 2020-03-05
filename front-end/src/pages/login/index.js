@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import Layout from "../../common/loginLayout.js";
-import { Row, Col } from "antd";
+import { Row, Col, Carousel } from "antd";
 import Login from "./components/Login.js";
 
 export default class index extends Component {
@@ -8,8 +8,15 @@ export default class index extends Component {
     return (
       <div>
         <Layout {...this.props}>
-          <Row>
-            <Col md={12}>This is gonna be picture</Col>
+          <Row style={{ height: "100vh" }} justify="spacearound" align="middle">
+            <Col md={12} style={{ textAlign: "center" }}>
+              <img
+                src="/images/bank.jpg"
+                width="80%"
+                height="80%"
+                alt="Bank"
+              ></img>
+            </Col>
             <Col md={12}>
               <Login />
             </Col>

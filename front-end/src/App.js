@@ -1,25 +1,32 @@
 import React from "react";
-import { Switch, Route, Redirect } from "react-router-dom";
-import jwtDecode from "jwt-decode";
-import home from "./pages/home/";
-import loginPage from "./pages/login";
-import registerPage from "./pages/register";
-import activityPage from "./pages/activity";
-import historyPage from "./pages/history";
 
-function App() {
-  return (
-    <div>
-      <Switch>
-        <Route exact path="/" component={loginPage} />
-        <Route exaxt path="/home" component={home} />
-        <Route exact path="/register" component={registerPage} />
-        <Route exact path="/newactivity" component={activityPage} />
-        <Route exact path="/history" component={historyPage} />
-        <Redirect to="/" />
-      </Switch>
-    </div>
-  );
+import { Switch, withRouter } from "react-router-dom";
+import PrivateRoute from "./routes/PrivateRoutes";
+import jwtDecode from "jwt-decode";
+
+class App extends React.Component {
+  getUser = () => {
+    const token = localStorage.getItem("Access_TOKEN");
+    if (!token) {
+      return {
+        role: "guest"
+      };
+    }
+    let user = jwtDecode(token);
+    return user;
+  };
+
+  render() {
+    let user = this.getUser();
+    console.log(user);
+    return (
+      <div>
+        <Switch>
+          <PrivateRoute role={user.role} />
+        </Switch>
+      </div>
+    );
+  }
 }
 
-export default App;
+export default withRouter(App);
