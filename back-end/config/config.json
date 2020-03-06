@@ -1,7 +1,7 @@
 {
   "development": {
     "username": "root",
-    "password": "nutbonus12",
+    "password": "your-password",
     "database": "income-expense-account",
     "host": "127.0.0.1",
     "dialect": "mysql",

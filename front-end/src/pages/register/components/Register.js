@@ -12,7 +12,7 @@ export default class Register extends Component {
           console.log(res);
           console.log("Success:", values);
           successRegister();
-          window.location.reload();
+          window.location.reload(true);
         })
         .catch(err => {
           console.log("Something Wrong");

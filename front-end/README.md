@@ -1,68 +1,96 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Money Manager
 
-## Available Scripts
+## 📘 Description
 
-In the project directory, you can run:
+Money Manager is a Web application that helps you record your income and expenses
 
-### `yarn start`
+## 📦 Built With
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### Frontend
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+- [x] React
+- [x] React Hooks
+- [x] Ant Design
+- [x] Material-UI
 
-### `yarn test`
+### Backend
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- [x] NodeJS
+- [x] Express
+- [x] MySQL2
 
-### `yarn build`
+## 🛠 Structure
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```mermaid
+graph LR;
+  Money Manager-frontend --> Money Manager-backend;
+  Money Manager-backend -->JWT
+  JWT -->|Authentication| Money Manager-backend;
+  Money Manager-backend --> Sequelize;
+  Sequelize --> MySQL;
+```
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+## 📋 Features
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- Show total of your accounts
+- Show History
+- Add/Edit/Delete Income
+- Add/Edit/Delete Expense
 
-### `yarn eject`
+## 💡 Getting Started
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+Clone Project
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```bash
+git clone https://github.com/eitagi12/Income-and-Expense-Account.git
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+### Frontend
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+```bash
+cd Income-and-Expense-Account
+/front-end
+npm install
+npm start
+```
 
-## Learn More
+### Backend
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```bash
+cd Income-and-Expense-Account
+/back-end
+npm install
+node index.js
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Before `node index.js` edit your password and database name in config/config.json
 
-### Code Splitting
+## ⚙️ Configurations
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+Edit your password and database name in config/config.json
 
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `yarn build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+```bash
+{
+  "development": {
+    "username": "root",
+    "password": "your-password",
+    "database": "your-db",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "test": {
+    "username": "root",
+    "password": "your-password",
+    "database": "your-db",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "root",
+    "password": "your-password",
+    "database": "your-db",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  }
+}
+```

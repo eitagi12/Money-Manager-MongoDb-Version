@@ -5,8 +5,7 @@ import ClearIcon from "@material-ui/icons/Clear";
 
 const successRegister = message => {
   notification.open({
-    message: "Register successfull",
-    description: "Welcome to Money Manager",
+    message: "Register Successfull",
     icon: <CheckIcon />
   });
 };

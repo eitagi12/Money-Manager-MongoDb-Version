@@ -96,6 +96,7 @@ export default function FullWidthTabs() {
   return (
     <div className={classes.root} style={{ paddingBottom: "50px" }}>
       <InputAmount />
+      <h1 style={{ textAlign: "center", fontWeight: "bold" }}>Recently add</h1>
       <AppBar position="static" color="default">
         <Tabs
           value={value}

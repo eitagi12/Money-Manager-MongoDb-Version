@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import Layout from "../../common/loginLayout.js";
-import { Row, Col, Carousel } from "antd";
+import { Row, Col } from "antd";
 import Login from "./components/Login.js";
 
 export default class index extends Component {

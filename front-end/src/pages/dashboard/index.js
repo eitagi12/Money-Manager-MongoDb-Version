@@ -9,7 +9,7 @@ export default class index extends Component {
   render() {
     return (
       <Layout {...this.props}>
-        <Row style={{ height: "100%" }}>
+        <Row style={{ height: "100vh" }}>
           <Col md={8} align="middle">
             <Income />
           </Col>

@@ -10,6 +10,7 @@ import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import { DeleteOutlined } from "@ant-design/icons";
 import { EditOutlined } from "@ant-design/icons";
+import { successEdit, successDelete } from "./notification/notification.js";
 
 var moment = require("moment");
 
@@ -61,6 +62,7 @@ export default class History extends Component {
     Axios.delete(`/deleteactivity/${id}`)
       .then(result => {
         this.fetchData();
+        successDelete();
       })
       .catch(err => {
         console.error(err);
@@ -83,6 +85,7 @@ export default class History extends Component {
     };
     Axios.put(`/update-activity/${id}`, payload)
       .then(result => {
+        successEdit();
         console.log(result);
         this.fetchData();
         let visible = this.state.visible;
@@ -151,6 +154,7 @@ export default class History extends Component {
             </Col>
           </Row>
         </Form>
+        <h5 style={{ textAlign: "center" }}>*Default Show today</h5>
 
         <Row style={{ height: "100vh" }}>
           <Col xs={1} md={4}></Col>
@@ -173,7 +177,9 @@ export default class History extends Component {
                       <TableRow key={row.id}>
                         <TableCell align="center">{row.remarks}</TableCell>
                         <TableCell align="center" style={{ color }}>
-                          {sign + " " + row.amount}
+                          {sign +
+                            " " +
+                            new Intl.NumberFormat().format(row.amount)}
                         </TableCell>
                         <TableCell align="center">{row.date}</TableCell>
                         <TableCell align="center">

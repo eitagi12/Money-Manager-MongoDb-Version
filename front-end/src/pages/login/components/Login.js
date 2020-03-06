@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Form, Input, Button, Checkbox, Row, Col } from "antd";
+import { Form, Input, Button, Row } from "antd";
 import Axios from "../../../config/axios.setup.js";
 import { Link } from "react-router-dom";
 
