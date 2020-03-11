@@ -13,11 +13,12 @@ import { EditOutlined } from "@ant-design/icons";
 import { successEdit, successDelete } from "./notification/notification.js";
 
 var moment = require("moment");
+const dateFormat = "YYYY-MM-DD";
 
 export default class History extends Component {
   state = {
     historyData: [],
-    remark: "",
+    remarks: "",
     amount: "",
     date: "",
     visible: []
@@ -69,17 +70,23 @@ export default class History extends Component {
       });
   };
 
-  showModal = idx => {
-    let visible = this.state.visible;
-    visible[idx] = true;
-    this.setState({
-      visible
+  showModal = (_id, idx) => {
+    Axios.get(`/getactivityone/${_id}`).then(res => {
+      console.log(res);
+      let visible = this.state.visible;
+      visible[idx] = true;
+      this.setState({
+        remarks: res.data.remarks,
+        amount: res.data.amount,
+        date: res.data.date,
+        visible
+      });
     });
   };
 
   handleOk = (id, idx) => {
     let payload = {
-      remarks: this.state.remark,
+      remarks: this.state.remarks,
       amount: this.state.amount,
       date: this.state.date
     };
@@ -163,7 +170,7 @@ export default class History extends Component {
               <Table aria-label="simple table">
                 <TableHead>
                   <TableRow>
-                    <TableCell align="center">Remark</TableCell>
+                    <TableCell align="center">Remarks</TableCell>
                     <TableCell align="center">Amount (Baht)</TableCell>
                     <TableCell align="center">Date</TableCell>
                     <TableCell align="center">Modify</TableCell>
@@ -174,7 +181,7 @@ export default class History extends Component {
                     let color = row.type === "income" ? "green" : "red";
                     let sign = row.type === "income" ? "+" : "-";
                     return (
-                      <TableRow key={row.id}>
+                      <TableRow key={row._id}>
                         <TableCell align="center">{row.remarks}</TableCell>
                         <TableCell align="center" style={{ color }}>
                           {sign +
@@ -186,28 +193,29 @@ export default class History extends Component {
                           <Button
                             type="primary"
                             danger
-                            onClick={this.handleDelete.bind(this, row.id)}
+                            onClick={this.handleDelete.bind(this, row._id)}
                           >
                             <DeleteOutlined />
                           </Button>
                           <Button
                             type="primary"
-                            onClick={() => this.showModal(idx)}
+                            onClick={() => this.showModal(row._id, idx)}
                           >
                             <EditOutlined />
                           </Button>
                           <Modal
                             title="Edit"
                             visible={this.state.visible[idx]}
-                            onOk={() => this.handleOk(row.id, idx)}
+                            onOk={() => this.handleOk(row._id, idx)}
                             onCancel={() => this.handleCancel(idx)}
                           >
                             <Row>
-                              Remark
+                              Remarks
                               <Input
-                                placeholder="New Remark"
+                                placeholder="New Remarks"
+                                value={this.state.remarks}
                                 onChange={e =>
-                                  this.setState({ remark: e.target.value })
+                                  this.setState({ remarks: e.target.value })
                                 }
                               />
                             </Row>
@@ -217,6 +225,7 @@ export default class History extends Component {
                                 type="number"
                                 min="0"
                                 placeholder="New Amount"
+                                value={this.state.amount}
                                 onChange={e =>
                                   this.setState({ amount: e.target.value })
                                 }
@@ -226,6 +235,11 @@ export default class History extends Component {
                             <Row style={{ marginTop: "10px" }}>
                               Date
                               <DatePicker
+                                defaultValue={moment(
+                                  this.state.date,
+                                  "YYYY-MM-DD"
+                                )}
+                                format={dateFormat}
                                 onChange={(date, dateString) =>
                                   this.setState({ date: dateString })
                                 }

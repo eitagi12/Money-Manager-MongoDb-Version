@@ -2,27 +2,30 @@ const passport = require("passport");
 const jwt = require("jsonwebtoken");
 const jwtOptions = require("../config/passport/passport");
 const moment = require("moment");
-const { Op } = require("sequelize");
+const ActivitySchema = require("../models/activity");
+const ObjectId = require("mongoose").Types.ObjectId;
+// const { Op } = require("sequelize");
 
 module.exports = (app, db) => {
   app.post(
     "/addactivity",
     passport.authenticate("jwt", { session: false }),
     function(req, res) {
-      db.activity
-        .create({
-          type: req.body.type,
-          amount: req.body.amount,
-          remarks: req.body.remarks,
-          date: req.body.date,
-          user_id: req.user.id
-        })
-        .then(result => {
-          res.status(201).send(result);
-        })
-        .catch(err => {
+      const activity = new ActivitySchema({
+        type: req.body.type,
+        amount: req.body.amount,
+        remarks: req.body.remarks,
+        date: req.body.date,
+        user_id: req.user.id
+      });
+      activity.save(function(err, user) {
+        if (err) {
+          console.error(err);
           res.status(400).send({ message: err.message });
-        });
+          return;
+        }
+        res.status(200).send({ message: "Created Activity successfully" });
+      });
     }
   );
   app.get(
@@ -37,66 +40,86 @@ module.exports = (app, db) => {
     "/getactivity",
     passport.authenticate("jwt", { session: false }),
     function(req, res) {
-      db.activity
-        .findAll({
-          where: {
-            user_id: req.user.id,
-            date: moment().format("YYYY-MM-DD")
-          },
-          order: [
-            ["date", "ASC"],
-            ["id", "ASC"]
-          ]
-        })
-        .then(result => {
-          res.status(201).send(result);
-        })
-        .catch(err => {
-          res.status(400).send({ message: err.message });
+      ActivitySchema.find({
+        user_id: req.user.id,
+        date: moment().format("YYYY-MM-DD")
+      })
+        .sort({ date: "desc" })
+        .exec(function(err, activity) {
+          console.log(activity);
+          if (err) {
+            console.error(err);
+            res.status(400).send({ message: err.message });
+            return;
+          }
+          res.status(200).send(activity);
         });
     }
   );
+
+  app.get(
+    "/getactivityone/:id",
+    passport.authenticate("jwt", { session: false }),
+    function(req, res) {
+      ActivitySchema.findOne(
+        {
+          _id: req.params.id,
+          user_id: req.user.id
+        },
+        function(err, activity) {
+          console.log(activity);
+          if (err) {
+            console.error(err);
+            res.status(400).send({ message: err.message });
+            return;
+          } else if (!activity) {
+            res.status(404).send({ message: "Activity not found" });
+            return;
+          }
+          res.status(200).send(activity);
+        }
+      );
+    }
+  );
+
   app.get(
     "/getincomeactivity",
     passport.authenticate("jwt", { session: false }),
     function(req, res) {
-      db.activity
-        .findAll({
-          where: {
-            user_id: req.user.id,
-            type: "income",
-            createdAt: {
-              [Op.gte]: moment()
-                .startOf("day")
-                .toDate()
-            }
-          },
-          order: [
-            ["date", "ASC"],
-            ["id", "ASC"]
-          ]
-        })
-        .then(result => {
-          res.status(201).send(result);
-        })
-        .catch(err => {
-          res.status(400).send({ message: err.message });
+      ActivitySchema.find({
+        user_id: req.user.id,
+        type: "income"
+      })
+        .sort({ date: "desc" })
+        .exec(function(err, activity) {
+          console.log(activity);
+          if (err) {
+            console.error(err);
+            res.status(400).send({ message: err.message });
+            return;
+          }
+          res.status(200).send(activity);
         });
     }
   );
+
   app.get(
     "/getexpenseactivity",
     passport.authenticate("jwt", { session: false }),
     function(req, res) {
-      db.activity
-        .findAll({
-          where: { user_id: req.user.id, type: "expense" }
-        })
-        .then(result => {
-          res.status(201).send(result);
-        })
-        .catch(err => {
-          res.status(400).send({ message: err.message });
+      ActivitySchema.find({
+        user_id: req.user.id,
+        type: "expense"
+      })
+        .sort({ date: "desc" })
+        .exec(function(err, activity) {
+          console.log(activity);
+          if (err) {
+            console.error(err);
+            res.status(400).send({ message: err.message });
+            return;
+          }
+          res.status(200).send(activity);
         });
     }
   );
@@ -105,17 +128,19 @@ module.exports = (app, db) => {
     "/getbydate",
     passport.authenticate("jwt", { session: false }),
     function(req, res) {
-      console.log({ req_body: req.body });
-      db.activity
-        .findAll({
-          where: { date: req.body.date, user_id: req.user.id }
-        })
-        .then(result => {
-          res.status(201).send(result);
-        })
-        .catch(err => {
-          console.log(err);
-          res.status(400).send({ message: err.message });
+      ActivitySchema.find({
+        user_id: req.user.id,
+        date: req.body.date
+      })
+        .sort({ date: "desc" })
+        .exec(function(err, activity) {
+          console.log(activity);
+          if (err) {
+            console.error(err);
+            res.status(400).send({ message: err.message });
+            return;
+          }
+          res.status(200).send(activity);
         });
     }
   );
@@ -124,16 +149,14 @@ module.exports = (app, db) => {
     "/deleteactivity/:id",
     passport.authenticate("jwt", { session: false }),
     function(req, res) {
-      db.activity
-        .destroy({
-          where: { id: req.params.id }
-        })
-        .then(result => {
-          res.status(201).send("Deleted");
-        })
-        .catch(err => {
+      ActivitySchema.deleteOne({ _id: req.params.id }, function(err) {
+        if (err) {
+          console.error(err);
           res.status(400).send({ message: err.message });
-        });
+          return;
+        }
+        res.status(200).send("Delete success");
+      });
     }
   );
 
@@ -141,19 +164,37 @@ module.exports = (app, db) => {
     "/update-activity/:id",
     passport.authenticate("jwt", { session: false }),
     async function async(req, res) {
-      let targetActivity = await db.activity.findOne({
-        where: { id: req.params.id, user_id: req.user.id }
-      });
-      if (!targetActivity) {
-        res.status(400).send({ message: "Activity is not found" });
-      } else {
-        targetActivity.update({
+      ActivitySchema.update(
+        { _id: req.params.id, user_id: req.user.id },
+        {
           amount: req.body.amount,
           remarks: req.body.remarks,
           date: req.body.date
-        });
-        res.status(200).json({ message: "success" });
-      }
+        },
+        { upsert: false },
+        function(err, activity) {
+          if (err) {
+            console.error(err);
+            res.status(400).send({ message: err.message });
+            return;
+          }
+          res.status(200).send("Updated");
+        }
+      );
+
+      // let targetActivity = await db.activity.findOne({
+      //   where: { id: req.params.id, user_id: req.user.id }
+      // });
+      // if (!targetActivity) {
+      //   res.status(400).send({ message: "Activity is not found" });
+      // } else {
+      //   targetActivity.update({
+      //     amount: req.body.amount,
+      //     remarks: req.body.remarks,
+      //     date: req.body.date
+      //   });
+      //   res.status(200).json({ message: "success" });
+      // }
     }
   );
 
@@ -163,37 +204,30 @@ module.exports = (app, db) => {
     async function(req, res) {
       let incomeDashboard = 0;
       let expenseDashboard = 0;
+      let balanceDashboard = 0;
 
-      await db.activity
-        .findAll({
-          attributes: [
-            [db.Sequelize.fn("SUM", db.Sequelize.col("amount")), "totalAmount"]
-          ],
-          where: { user_id: req.user.id, type: "income" }
-        })
-        .then(result => {
-          incomeDashboard = result[0].dataValues.totalAmount;
-        })
-        .catch(err => {
-          res.status(400).send({ message: err.message });
-        });
-      await db.activity
-        .findAll({
-          attributes: [
-            [db.Sequelize.fn("SUM", db.Sequelize.col("amount")), "totalAmount"]
-          ],
-          where: { user_id: req.user.id, type: "expense" }
-        })
-        .then(result => {
-          expenseDashboard = result[0].dataValues.totalAmount;
-        })
-        .catch(err => {
-          res.status(400).send({ message: err.message });
-        });
-      let balanceDashboard = incomeDashboard - expenseDashboard;
-      res
-        .status(200)
-        .send({ incomeDashboard, expenseDashboard, balanceDashboard });
+      ActivitySchema.find(
+        {
+          user_id: req.user.id
+        },
+        (err, activitys) => {
+          if (err) {
+            console.log(err);
+            res.status(400).send();
+          }
+          activitys.forEach((activity, index) => {
+            if (activity.type === "income") {
+              incomeDashboard += activity.amount;
+            } else {
+              expenseDashboard += activity.amount;
+            }
+          });
+          balanceDashboard = incomeDashboard - expenseDashboard;
+          res
+            .status(200)
+            .send({ incomeDashboard, expenseDashboard, balanceDashboard });
+        }
+      );
     }
   );
 };

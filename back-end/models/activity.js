@@ -1,22 +1,13 @@
-module.exports = (sequelize, DataType) => {
-  const activity = sequelize.define("activity", {
-    type: {
-      type: DataType.STRING(100)
-    },
-    amount: {
-      type: DataType.BIGINT(20)
-    },
-    remarks: {
-      type: DataType.STRING(200)
-    },
-    date: {
-      type: DataType.STRING(255)
-    }
-  });
-  activity.associate = models => {
-    activity.belongsTo(models.user, {
-      foreignKey: "user_id"
-    });
-  };
-  return activity;
-};
+var mongoose = require("mongoose");
+
+var activitySchema = mongoose.Schema({
+  type: { type: String, required: true },
+  amount: { type: Number, required: true },
+  remarks: { type: String, required: true },
+  date: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now },
+  user_id: { type: mongoose.Schema.Types.ObjectId, ref: "user" }
+});
+
+var activity = mongoose.model("activity", activitySchema);
+module.exports = activity;
