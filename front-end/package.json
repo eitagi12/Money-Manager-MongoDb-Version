@@ -13,7 +13,7 @@
     "cors": "^2.8.5",
     "jwt-decode": "^2.2.0",
     "material-ui-icons": "^1.0.0-beta.36",
-    "moment": "^2.24.0",
+    "moment": "^2.29.4",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
     "react-router-dom": "^5.1.2",
